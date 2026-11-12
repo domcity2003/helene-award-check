@@ -2,6 +2,8 @@
 
 Check the FEMA figures in a draft recovery briefing before it goes out. Give the checker a CSV and a quarter-end date. It returns the supported amounts, flags discrepancies, and shows which transactions support each result.
 
+**Try the offline walkthrough.** Download `walkthrough.html` from the file page using **Download raw file**, then open it in your browser. Inspect the real debris removal discrepancy, correct the March practice draft, and download the corrected CSV and supporting evidence. The walkthrough embeds results calculated from the pinned data. Use the CLI to review your own files. [Walkthrough file](walkthrough.html).
+
 **In the March example, a draft uses $286,345,207.02 for one North Carolina Emergency Management project. The amount as of March 31 was $200,013,459.45.** Two later transactions explain the entire $86,331,747.57 difference. The example draft intentionally uses the wrong balance from real FEMA records.
 
 ## Run the example
@@ -81,4 +83,26 @@ Run `python check.py audit-history` for the two earlier reports. It returns exit
 
 The March check uses the explicit Category B obligation in the narrative. The report labels the nearby table as expenditures and describes its overall Public Assistance figure inconsistently on page 16, so the audit includes only the Category B obligation from that report. The public records do not establish the cause of either difference. Both earlier dates require additional evidence before the checker can use them for draft review. [March report, pp. 15–16](https://www.wncrecovery.nc.gov/grow-nc-q3qr-2025/open#page=15) · [June report, p. 67](https://www.wncrecovery.nc.gov/grow-nc-q4qr-2025/open#page=69).
 
+### Investigating the June debris removal difference
+
+```sh
+python investigate.py
+python investigate.py --json > june-investigation.json
+```
+
+The replay sums 122 signed activities across 121 worksheets through June 30. The following seven days add $134,219.98. Using dates through the August 15 publication still leaves $1,955,589.26 unexplained. No single checked transaction, worksheet balance through June 30, or later cutoff through publication equals the published difference. The JSON includes every activity used, the source page and hash, and the exact Grants Portal export needed for a worksheet-by-worksheet comparison. The command returns exit code 1 while the difference is unresolved. [June report, p. 67](https://www.wncrecovery.nc.gov/grow-nc-q4qr-2025/open#page=69).
+
+### Comparing successive OpenFEMA captures
+
+```sh
+python snapshots.py capture captures/new
+python snapshots.py compare captures/new --json > capture-comparison.json
+```
+
+The default baseline is the repository's pinned capture. Use `--previous captures/older` to compare two downloads. Each capture saves the raw responses and hash manifest to a fresh directory after verifying scope and pagination. Comparison uses worksheet, applicant, category, effective date, version and signed cents. It preserves repeated activities and ignores changes to public row IDs. The JSON shows additions and removals and the before-and-after balances by reporting date. Exit code 1 means at least one supported cutoff has changed activity, including changes that net to zero. Exit code 2 means the operation could not be verified.
+
+The first live verification fetched 3,384 records and found zero financial differences from the pinned capture. The tests also check a controlled revision and confirm that the dates before and after it report the expected balances.
+
 Run `python -m unittest -v` to reproduce the QA checks. They cover signed reductions, one-cent discrepancies, unknown and future worksheets, invalid input, source tampering, rounding, and the historical exceptions. GitHub Actions runs the checks on Windows and Linux.
+
+Regenerate the walkthrough after changing its template or evidence with `python build_walkthrough.py`.

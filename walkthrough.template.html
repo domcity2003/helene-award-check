@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Helene Award Check</title>
+<style>
+  :root { color-scheme: light; --paper:#f7f6f1; --panel:#fffefa; --ink:#172c2e; --muted:#536364; --line:#d9dfd8; --accent:#175149; --amber:#835019; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.5 "Instrument Sans", Arial, sans-serif; }
+  main { max-width:1120px; margin:auto; padding:42px 32px 56px; }
+  header { border-top:5px solid var(--ink); padding-top:23px; margin-bottom:25px; }
+  .context { margin:0; color:var(--muted); font-size:.85rem; }
+  h1 { margin:3px 0 4px; font-size:clamp(2rem, 5vw, 3.35rem); line-height:1.1; letter-spacing:-.055em; }
+  h2 { font-size:1.3rem; letter-spacing:-.025em; margin:0; }
+  p { margin:7px 0 0; }
+  section { background:var(--panel); border:1px solid var(--line); padding:20px 23px; margin-top:14px; }
+  .section-head { display:flex; justify-content:space-between; align-items:baseline; gap:8px 18px; flex-wrap:wrap; }
+  .state { color:var(--amber); font-weight:700; font-size:.85rem; }
+  .state.passed { color:var(--accent); }
+  .metrics { display:grid; grid-template-columns:repeat(3,1fr); margin:16px 0; border-block:1px solid var(--line); }
+  .metric { padding:9px 12px 9px 0; }
+  .metric + .metric { padding-left:14px; border-left:1px solid var(--line); }
+  .metric span { display:block; font-size:.82rem; color:var(--muted); }
+  .metric strong { font-size:clamp(1rem, 3vw, 1.6rem); font-variant-numeric:tabular-nums; letter-spacing:-.04em; }
+  .metric:last-child strong { color:var(--amber); }
+  .note, .sources { font-size:.89rem; color:var(--muted); }
+  a { color:var(--accent); text-underline-offset:3px; }
+  details { margin:13px 0 0; }
+  summary { cursor:pointer; color:var(--accent); font-weight:700; width:fit-content; }
+  .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; }
+  button { border:1px solid var(--accent); color:var(--accent); background:transparent; border-radius:3px; padding:7px 11px; font:inherit; font-size:.85rem; font-weight:700; cursor:pointer; }
+  button.primary { background:var(--accent); color:white; }
+  button:disabled { opacity:.52; cursor:default; }
+  :focus-visible { outline:3px solid #9c5a17; outline-offset:3px; }
+  .table-wrap { overflow:auto; margin-top:10px; }
+  table { width:100%; border-collapse:collapse; font-size:.88rem; font-variant-numeric:tabular-nums; }
+  th, td { border-bottom:1px solid var(--line); text-align:left; padding:7px 10px 7px 0; }
+  th { color:var(--muted); font-size:.76rem; }
+  .num { text-align:right; white-space:nowrap; }
+  tr.flagged td:first-child, tr.flagged td:last-child { color:var(--amber); font-weight:700; }
+  #later { margin-top:4px; max-width:590px; }
+  @media(max-width:600px) {
+    main { padding:22px 15px 38px; } section { padding:15px; }
+    .metrics { grid-template-columns:1fr; }
+    .metric + .metric { border-left:0; padding-left:0; border-top:1px solid var(--line); }
+    .draft-table thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+    .draft-table, .draft-table tbody { display:block; }
+    .draft-table tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); border-bottom:1px solid var(--line); padding:7px 0; }
+    .draft-table td { border:0; padding:3px 4px 3px 0; text-align:left; }
+    .draft-table td:first-child, .draft-table td:last-child { grid-column:1/-1; }
+    .draft-table td[data-label]::before { content:attr(data-label); display:block; color:var(--muted); font-size:.73rem; font-weight:400; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="context">North Carolina Hurricane Helene · FEMA Public Assistance</p>
+    <h1>Helene Award Check</h1>
+    <p>Investigate a published discrepancy and review a draft briefing before it goes out.</p>
+  </header>
+
+  <section aria-labelledby="investigation-title">
+    <div class="section-head">
+      <h2 id="investigation-title">Debris removal · June 30, 2025</h2>
+      <span class="state">Unresolved discrepancy</span>
+    </div>
+    <div class="metrics">
+      <div class="metric"><span>Published</span><strong id="published"></strong></div>
+      <div class="metric"><span>Rebuilt from FEMA activity</span><strong id="rebuilt"></strong></div>
+      <div class="metric"><span>Difference</span><strong id="gap"></strong></div>
+    </div>
+    <p id="investigation-summary"></p>
+    <details>
+      <summary>See the investigation checks</summary>
+      <p id="checks" class="note"></p>
+      <p id="evidence-needed" class="note"></p>
+    </details>
+    <div class="actions">
+      <a id="published-source" href="#">Open state report, p. 67</a>
+      <button type="button" id="investigation-export">Download investigation evidence</button>
+    </div>
+  </section>
+
+  <section aria-labelledby="draft-title">
+    <div class="section-head">
+      <h2 id="draft-title">Practice briefing · March 31, 2026</h2>
+      <span id="draft-status" class="state" role="status"></span>
+    </div>
+    <p class="note">Sample draft with an intentionally incorrect amount from real FEMA records.</p>
+    <div class="table-wrap" tabindex="0" aria-label="Draft figures">
+      <table class="draft-table" role="table">
+        <thead role="rowgroup"><tr role="row"><th role="columnheader" scope="col">Briefing line</th><th role="columnheader" scope="col" class="num">Draft</th><th role="columnheader" scope="col" class="num">Supported</th><th role="columnheader" scope="col" class="num">Difference</th></tr></thead>
+        <tbody id="draft-rows" role="rowgroup"></tbody>
+      </table>
+    </div>
+    <details>
+      <summary>See the two transactions after the cutoff</summary>
+      <table id="later"><thead><tr><th scope="col">Obligated</th><th scope="col">Worksheet revision</th><th scope="col" class="num">Federal share</th></tr></thead><tbody></tbody></table>
+      <p class="sources"><a id="worksheet-source" href="#">Open FEMA worksheet activity</a></p>
+    </details>
+    <div class="actions">
+      <button type="button" id="apply" class="primary">Apply correction and recheck</button>
+      <button type="button" id="reset" disabled>Reset draft</button>
+      <button type="button" id="export-csv" disabled>Download corrected CSV</button>
+      <button type="button" id="export-json" disabled>Download review evidence</button>
+    </div>
+  </section>
+  <noscript><p>Enable JavaScript to use the walkthrough.</p></noscript>
+</main>
+<script id="data" type="application/json"><!-- WALKTHROUGH_DATA --></script>
+<script>
+  "use strict";
+  const data = JSON.parse(document.getElementById("data").textContent);
+  const byId = id => document.getElementById(id);
+  const investigation = data.investigation;
+  const dollars = new Intl.NumberFormat("en-US", {style:"currency", currency:"USD"});
+  const money = cents => dollars.format(cents / 100);
+  const labels = {
+    "NCEM-4341": "NC Emergency Management · PW 4341",
+    "MADISON-370": "Madison County · PW 370",
+    "CAT-B": "Emergency protective measures · Category B",
+    "PA-TOTAL": "Statewide Public Assistance"
+  };
+
+  byId("published").textContent = investigation.observation.published_amount;
+  byId("rebuilt").textContent = money(investigation.observation.rebuilt_cents);
+  byId("gap").textContent = money(investigation.published_less_rebuilt_cents);
+  byId("investigation-summary").textContent =
+    `Extending the replay through the report’s August 15 publication still leaves a ${money(investigation.remaining_gap_at_publication_cents)} gap.`;
+  byId("checks").textContent =
+    `The June replay includes ${investigation.activities_at_cutoff} activities across ${investigation.worksheets_at_cutoff} worksheets. The next seven days add ${money(investigation.week_after_cutoff_net_cents)}. No single checked transaction, worksheet balance, or later cutoff through publication matches the difference.`;
+  byId("evidence-needed").textContent = investigation.evidence_needed;
+  byId("published-source").href = investigation.observation.published_source.url;
+
+  function makeRow(table, cells, flagged = false) {
+    const row = table.insertRow();
+    if (flagged) row.classList.add("flagged");
+    const draft = table.id === "draft-rows";
+    if (draft) row.setAttribute("role", "row");
+    const columnLabels = ["", "Draft", "Supported", "Difference"];
+    for (const [index, value] of cells.entries()) {
+      const cell = row.insertCell();
+      cell.textContent = value;
+      if (draft) {
+        cell.setAttribute("role", "cell");
+        if (index > 0) cell.dataset.label = columnLabels[index];
+      }
+      if (index >= (draft ? 1 : 2)) cell.classList.add("num");
+    }
+  }
+
+  const exception = data.initial.find(row => row.status === "matches_later_balance");
+  byId("worksheet-source").href = exception.worksheet_source;
+  for (const event of exception.after_cutoff) {
+    makeRow(byId("later").tBodies[0], [event.date, `PW ${event.worksheet} · v${event.version}`, money(event.amount_cents)]);
+  }
+
+  function render(corrected) {
+    const rows = corrected ? data.corrected : data.initial;
+    const table = byId("draft-rows");
+    table.replaceChildren();
+    for (const row of rows) {
+      makeRow(table, [labels[row.line_id], money(row.proposed_cents), money(row.supported_cents),
+        row.difference_cents ? money(row.difference_cents) : "Matches"], row.status !== "match");
+    }
+    const pending = rows.filter(row => row.status !== "match").length;
+    byId("draft-status").textContent = pending ? `${pending} figure needs review` : `${rows.length} of ${rows.length} figures match`;
+    byId("draft-status").classList.toggle("passed", !pending);
+    byId("apply").disabled = corrected;
+    for (const id of ["reset", "export-csv", "export-json"]) byId(id).disabled = !corrected;
+  }
+
+  function download(name, content, type) {
+    const url = URL.createObjectURL(new Blob([content], {type}));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = name;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  byId("apply").addEventListener("click", () => { render(true); byId("export-csv").focus(); });
+  byId("reset").addEventListener("click", () => { render(false); byId("apply").focus(); });
+  byId("export-csv").addEventListener("click", () => {
+    const rows = data.corrected.map(row =>
+      [row.line_id, row.scope, row.key, (row.proposed_cents / 100).toFixed(2)].join(","));
+    download("march-reviewed.csv", ["line_id,scope,key,proposed_usd", ...rows, ""].join("\r\n"), "text/csv");
+  });
+  byId("export-json").addEventListener("click", () => {
+    const {cutoff, initial, corrected, published_source, source_pages} = data;
+    download("march-review-evidence.json", JSON.stringify(
+      {cutoff, initial, corrected, published_source, source_pages}, null, 2), "application/json");
+  });
+  byId("investigation-export").addEventListener("click", () => {
+    download("june-2025-debris-investigation.json", JSON.stringify(
+      {...investigation, source_pages:data.source_pages}, null, 2), "application/json");
+  });
+  render(false);
+</script>
+</body>
+</html>
