@@ -2,7 +2,7 @@
 
 Check the FEMA figures in a draft recovery briefing before it goes out. Give the checker a CSV and a quarter-end date. It returns the supported amounts, flags discrepancies, and shows which transactions support each result.
 
-**Try the offline walkthrough.** Download `walkthrough.html` from the file page using **Download raw file**, then open it in your browser. Inspect the real debris removal discrepancy, correct the March practice draft, and download the corrected CSV and supporting evidence. The walkthrough embeds results calculated from the pinned data. Use the CLI to review your own files. [Walkthrough file](walkthrough.html).
+**Try the offline walkthrough.** Download `walkthrough.html` from the file page using **Download raw file**, then open it in your browser. Select a report line to see its balances, source records, and any action the reviewer can take. Correct the March practice draft and export the CSV, or open the June published report to inspect the unresolved discrepancy and the malformed source figure. The walkthrough embeds results calculated from the pinned data. Use the CLI to review your own files. [Walkthrough file](walkthrough.html).
 
 **In the March example, a draft uses $286,345,207.02 for one North Carolina Emergency Management project. The amount as of March 31 was $200,013,459.45.** Two later transactions explain the entire $86,331,747.57 difference. The example draft intentionally uses the wrong balance from real FEMA records.
 

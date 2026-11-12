@@ -5,171 +5,341 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Helene Award Check</title>
 <style>
-  :root { color-scheme: light; --paper:#f7f6f1; --panel:#fffefa; --ink:#172c2e; --muted:#536364; --line:#d9dfd8; --accent:#175149; --amber:#835019; }
+  :root {
+    color-scheme:light; --ink:#182435; --muted:#536175; --line:#d5dde7;
+    --navy:#142335; --blue:#1d55a0; --selected:#edf4fd; --subtle:#f4f6f9;
+    --amber:#8a4909; --green:#256548;
+  }
   * { box-sizing:border-box; }
-  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.5 "Instrument Sans", Arial, sans-serif; }
-  main { max-width:1120px; margin:auto; padding:42px 32px 56px; }
-  header { border-top:5px solid var(--ink); padding-top:23px; margin-bottom:25px; }
-  .context { margin:0; color:var(--muted); font-size:.85rem; }
-  h1 { margin:3px 0 4px; font-size:clamp(2rem, 5vw, 3.35rem); line-height:1.1; letter-spacing:-.055em; }
-  h2 { font-size:1.3rem; letter-spacing:-.025em; margin:0; }
-  p { margin:7px 0 0; }
-  section { background:var(--panel); border:1px solid var(--line); padding:20px 23px; margin-top:14px; }
-  .section-head { display:flex; justify-content:space-between; align-items:baseline; gap:8px 18px; flex-wrap:wrap; }
-  .state { color:var(--amber); font-weight:700; font-size:.85rem; }
-  .state.passed { color:var(--accent); }
-  .metrics { display:grid; grid-template-columns:repeat(3,1fr); margin:16px 0; border-block:1px solid var(--line); }
-  .metric { padding:9px 12px 9px 0; }
-  .metric + .metric { padding-left:14px; border-left:1px solid var(--line); }
-  .metric span { display:block; font-size:.82rem; color:var(--muted); }
-  .metric strong { font-size:clamp(1rem, 3vw, 1.6rem); font-variant-numeric:tabular-nums; letter-spacing:-.04em; }
-  .metric:last-child strong { color:var(--amber); }
-  .note, .sources { font-size:.89rem; color:var(--muted); }
-  a { color:var(--accent); text-underline-offset:3px; }
-  details { margin:13px 0 0; }
-  summary { cursor:pointer; color:var(--accent); font-weight:700; width:fit-content; }
-  .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; }
-  button { border:1px solid var(--accent); color:var(--accent); background:transparent; border-radius:3px; padding:7px 11px; font:inherit; font-size:.85rem; font-weight:700; cursor:pointer; }
-  button.primary { background:var(--accent); color:white; }
-  button:disabled { opacity:.52; cursor:default; }
-  :focus-visible { outline:3px solid #9c5a17; outline-offset:3px; }
-  .table-wrap { overflow:auto; margin-top:10px; }
-  table { width:100%; border-collapse:collapse; font-size:.88rem; font-variant-numeric:tabular-nums; }
-  th, td { border-bottom:1px solid var(--line); text-align:left; padding:7px 10px 7px 0; }
-  th { color:var(--muted); font-size:.76rem; }
+  body { margin:0; color:var(--ink); background:var(--subtle); font:14px/1.5 "Inter","Segoe UI",Arial,sans-serif; }
+  button { font:inherit; color:inherit; cursor:pointer; }
+  a { color:var(--blue); text-underline-offset:3px; }
+  :focus-visible { outline:2px solid #3079c6; outline-offset:3px; }
+  [hidden] { display:none !important; }
+  .bar { background:var(--navy); color:white; }
+  .bar-inner, main { max-width:1520px; margin:auto; padding-inline:clamp(16px,3vw,44px); }
+  .bar-inner { min-height:53px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:3px 16px; padding-block:10px; }
+  .brand { font-weight:650; letter-spacing:.01em; }
+  .program { color:#c5d2e3; font-size:12px; }
+  main { padding-block:27px 38px; }
+  h1,h2,h3,p { margin:0; }
+  h1 { font-size:26px; line-height:1.25; letter-spacing:-.025em; font-weight:650; }
+  h2 { font-size:18px; line-height:1.3; font-weight:650; }
+  h3 { font-size:13px; font-weight:650; }
+  .intro { margin-top:4px; color:var(--muted); }
+  .reports { display:flex; flex-wrap:wrap; gap:0 22px; margin-top:18px; border-bottom:1px solid var(--line); }
+  .reports button { text-align:left; border:0; border-bottom:2px solid transparent; background:transparent; padding:8px 2px; color:var(--muted); }
+  .reports button[aria-pressed="true"] { color:var(--blue); font-weight:650; border-bottom-color:var(--blue); }
+  .report-meta { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:3px 16px; padding:12px 0; font-size:13px; color:var(--muted); }
+  #report-status { font-weight:650; }
+  .workspace { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(320px,1fr); align-items:start; gap:16px; }
+  .queue,.record { border:1px solid var(--line); background:#fff; min-width:0; }
+  .queue { align-self:start; }
+  .queue-head { display:flex; justify-content:space-between; align-items:center; padding:11px 14px; gap:8px; border-bottom:1px solid var(--line); }
+  .count,.muted { color:var(--muted); font-size:12px; }
+  table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+  th,td { padding:9px 12px; text-align:left; border-bottom:1px solid var(--line); vertical-align:middle; }
+  thead th { background:var(--subtle); color:var(--muted); font-size:12px; font-weight:600; }
+  tbody td { font-size:13px; }
+  tbody tr:last-child > * { border-bottom:0; }
   .num { text-align:right; white-space:nowrap; }
-  tr.flagged td:first-child, tr.flagged td:last-child { color:var(--amber); font-weight:700; }
-  #later { margin-top:4px; max-width:590px; }
-  @media(max-width:600px) {
-    main { padding:22px 15px 38px; } section { padding:15px; }
-    .metrics { grid-template-columns:1fr; }
-    .metric + .metric { border-left:0; padding-left:0; border-top:1px solid var(--line); }
-    .draft-table thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
-    .draft-table, .draft-table tbody { display:block; }
-    .draft-table tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); border-bottom:1px solid var(--line); padding:7px 0; }
-    .draft-table td { border:0; padding:3px 4px 3px 0; text-align:left; }
-    .draft-table td:first-child, .draft-table td:last-child { grid-column:1/-1; }
-    .draft-table td[data-label]::before { content:attr(data-label); display:block; color:var(--muted); font-size:.73rem; font-weight:400; }
+  .queue tbody th { text-align:left; font-weight:500; }
+  .queue tbody tr:hover { background:#f6f9fd; }
+  .queue tbody tr.selected { background:var(--selected); }
+  .queue tbody tr.selected > :first-child { box-shadow:inset 3px 0 var(--blue); }
+  .row-button { display:block; width:100%; background:none; border:0; padding:2px 0; text-align:left; color:var(--blue); font-size:13px; font-weight:650; }
+  .row-button:hover { text-decoration:underline; }
+  .row-meta { display:block; font-size:11px; color:var(--muted); margin-top:1px; }
+  .status { display:inline-flex; gap:6px; align-items:baseline; font-size:12px; font-weight:650; color:var(--amber); }
+  .status::before { content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:currentColor; flex:none; margin-bottom:2px; }
+  .status.match { color:var(--green); }
+  .record-head { padding:14px 16px; border-bottom:1px solid var(--line); }
+  .record-head .status { margin-top:5px; }
+  .record-body { padding:0 16px; }
+  .record-section { padding:13px 0; border-bottom:1px solid var(--line); }
+  .record-section:last-child { border:0; }
+  .record-section p { margin-top:5px; font-size:13px; }
+  .balances { display:grid; grid-template-columns:1fr auto; gap:0 12px; margin:0; font-size:13px; }
+  .balances dt,.balances dd { padding:4px 0; }
+  .balances dt { color:var(--muted); }
+  .balances dd { margin:0; text-align:right; font-weight:600; font-variant-numeric:tabular-nums; }
+  .balances .difference { border-top:1px solid var(--line); margin-top:3px; padding-top:7px; color:var(--ink); font-weight:650; }
+  .evidence-table { margin-top:8px; }
+  .evidence-table th,.evidence-table td { padding:5px 7px; }
+  .record-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:12px 16px; background:var(--subtle); border-top:1px solid var(--line); }
+  .control { padding:6px 10px; border:1px solid #aebdce; background:white; border-radius:3px; font-size:12px; font-weight:650; }
+  .control:hover { background:#eaf0f7; }
+  .control.primary { background:#22599e; color:white; border-color:#22599e; }
+  .control.primary:hover { background:#174780; }
+  .links { display:flex; flex-wrap:wrap; gap:5px 16px; font-size:12px; }
+  #draft-exports { display:flex; flex-wrap:wrap; gap:8px; }
+  #review-note { margin-top:12px; font-size:12px; color:var(--muted); }
+  @media(max-width:1130px) { .table-comparison { display:none; } }
+  @media(max-width:760px) {
+    main { padding-block:20px 28px; }
+    .workspace { grid-template-columns:minmax(0,1fr); gap:12px; }
+    h1 { font-size:22px; }
+  }
+  @media(max-width:400px) {
+    th,td { padding-inline:8px; }
+    .queue td,.row-button { font-size:12px; }
+    .queue .status { font-size:11px; }
+    .queue .status::before { display:none; }
   }
 </style>
 </head>
 <body>
+<header class="bar">
+  <div class="bar-inner">
+    <span class="brand">Helene Award Check</span>
+    <span class="program">North Carolina · FEMA Public Assistance · DR-4827</span>
+  </div>
+</header>
 <main>
-  <header>
-    <p class="context">North Carolina Hurricane Helene · FEMA Public Assistance</p>
-    <h1>Helene Award Check</h1>
-    <p>Investigate a published discrepancy and review a draft briefing before it goes out.</p>
-  </header>
-
-  <section aria-labelledby="investigation-title">
-    <div class="section-head">
-      <h2 id="investigation-title">Debris removal · June 30, 2025</h2>
-      <span class="state">Unresolved discrepancy</span>
-    </div>
-    <div class="metrics">
-      <div class="metric"><span>Published</span><strong id="published"></strong></div>
-      <div class="metric"><span>Rebuilt from FEMA activity</span><strong id="rebuilt"></strong></div>
-      <div class="metric"><span>Difference</span><strong id="gap"></strong></div>
-    </div>
-    <p id="investigation-summary"></p>
-    <details>
-      <summary>See the investigation checks</summary>
-      <p id="checks" class="note"></p>
-      <p id="evidence-needed" class="note"></p>
-    </details>
-    <div class="actions">
-      <a id="published-source" href="#">Open state report, p. 67</a>
-      <button type="button" id="investigation-export">Download investigation evidence</button>
-    </div>
-  </section>
-
-  <section aria-labelledby="draft-title">
-    <div class="section-head">
-      <h2 id="draft-title">Practice briefing · March 31, 2026</h2>
-      <span id="draft-status" class="state" role="status"></span>
-    </div>
-    <p class="note">Sample draft with an intentionally incorrect amount from real FEMA records.</p>
-    <div class="table-wrap" tabindex="0" aria-label="Draft figures">
-      <table class="draft-table" role="table">
-        <thead role="rowgroup"><tr role="row"><th role="columnheader" scope="col">Briefing line</th><th role="columnheader" scope="col" class="num">Draft</th><th role="columnheader" scope="col" class="num">Supported</th><th role="columnheader" scope="col" class="num">Difference</th></tr></thead>
-        <tbody id="draft-rows" role="rowgroup"></tbody>
+  <h1>Quarterly obligations review</h1>
+  <p class="intro">Check recovery briefing figures against FEMA award activity as of the reporting cutoff.</p>
+  <nav class="reports" aria-label="Reports">
+    <button id="march" type="button" aria-pressed="true">Mar 31, 2026 · Practice draft</button>
+    <button id="june" type="button" aria-pressed="false">Jun 30, 2025 · Published report</button>
+  </nav>
+  <div class="report-meta">
+    <span id="report-caption"></span>
+    <span id="report-status" role="status"></span>
+  </div>
+  <div class="workspace">
+    <section class="queue" aria-labelledby="queue-title">
+      <div class="queue-head">
+        <h3 id="queue-title">Report lines</h3>
+        <span class="count" id="line-count"></span>
+      </div>
+      <table>
+        <thead><tr>
+          <th scope="col">Line item</th>
+          <th scope="col" class="num table-comparison" id="reported-heading">Draft</th>
+          <th scope="col" class="num table-comparison">FEMA at cutoff</th>
+          <th scope="col" class="num">Difference</th>
+          <th scope="col">Result</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
       </table>
-    </div>
-    <details>
-      <summary>See the two transactions after the cutoff</summary>
-      <table id="later"><thead><tr><th scope="col">Obligated</th><th scope="col">Worksheet revision</th><th scope="col" class="num">Federal share</th></tr></thead><tbody></tbody></table>
-      <p class="sources"><a id="worksheet-source" href="#">Open FEMA worksheet activity</a></p>
-    </details>
-    <div class="actions">
-      <button type="button" id="apply" class="primary">Apply correction and recheck</button>
-      <button type="button" id="reset" disabled>Reset draft</button>
-      <button type="button" id="export-csv" disabled>Download corrected CSV</button>
-      <button type="button" id="export-json" disabled>Download review evidence</button>
-    </div>
-  </section>
+    </section>
+    <section class="record" id="record" aria-labelledby="record-title">
+      <div class="record-head">
+        <div class="muted" id="record-meta"></div>
+        <h2 id="record-title" tabindex="-1"></h2>
+        <span id="record-status" class="status"></span>
+      </div>
+      <div class="record-body">
+        <div class="record-section"><dl class="balances" id="balances"></dl></div>
+        <div class="record-section" id="finding">
+          <h3 id="finding-title"></h3>
+          <p id="finding-text"></p>
+          <table class="evidence-table" id="evidence-table" aria-label="FEMA award activity" hidden>
+            <thead><tr><th scope="col">Obligated</th><th scope="col">Revision</th><th class="num" scope="col">Federal share</th></tr></thead>
+            <tbody id="events"></tbody>
+          </table>
+        </div>
+        <div class="record-section" id="next-step" hidden>
+          <h3>Evidence needed</h3>
+          <p id="next-step-text"></p>
+        </div>
+        <div class="record-section links" aria-label="Sources">
+          <a id="report-source">State report</a>
+          <a id="fema-source">FEMA award activity</a>
+        </div>
+      </div>
+      <div class="record-actions" id="record-actions">
+        <button class="control primary" id="apply" type="button">Apply cutoff amount</button>
+        <div id="draft-exports" hidden>
+          <button class="control primary" id="export-csv" type="button">Download corrected CSV</button>
+          <button class="control" id="export-json" type="button">Download review evidence</button>
+          <button class="control" id="reset" type="button">Reset draft</button>
+        </div>
+        <button class="control" id="investigation-export" type="button" hidden>Download investigation evidence</button>
+      </div>
+    </section>
+  </div>
+  <p id="review-note">Amounts are federal obligations in USD. The practice draft contains one intentional error drawn from real records.</p>
   <noscript><p>Enable JavaScript to use the walkthrough.</p></noscript>
 </main>
 <script id="data" type="application/json"><!-- WALKTHROUGH_DATA --></script>
 <script>
   "use strict";
-  const data = JSON.parse(document.getElementById("data").textContent);
   const byId = id => document.getElementById(id);
+  const data = JSON.parse(byId("data").textContent);
   const investigation = data.investigation;
   const dollars = new Intl.NumberFormat("en-US", {style:"currency", currency:"USD"});
-  const money = cents => dollars.format(cents / 100);
-  const labels = {
-    "NCEM-4341": "NC Emergency Management · PW 4341",
-    "MADISON-370": "Madison County · PW 370",
-    "CAT-B": "Emergency protective measures · Category B",
-    "PA-TOTAL": "Statewide Public Assistance"
+  const dates = new Intl.DateTimeFormat("en-US", {month:"short", day:"numeric", year:"numeric", timeZone:"UTC"});
+  const dateLabel = day => dates.format(new Date(day));
+  const money = cents => cents === null ? "—" : dollars.format(cents / 100);
+  const delta = cents => (cents > 0 ? "+" : "") + money(cents);
+  const names = {
+    "NCEM-4341": ["NC Emergency Management", "Project worksheet 4341"],
+    "MADISON-370": ["Madison County", "Project worksheet 370"],
+    "CAT-B": [data.categories.B, "Category B"],
+    "PA-TOTAL": ["Statewide Public Assistance", "All categories"]
   };
+  const statusLabels = {
+    match:"Matches", matches_later_balance:"Later balance", mismatch:"Unresolved",
+    invalid_published_amount:"Invalid amount"
+  };
+  const femaDisaster = "https://www.fema.gov/api/open/v2/PublicAssistanceGrantAwardActivities?%24filter=disasterNumber%20eq%204827";
+  let report = "march";
+  let corrected = false;
+  const selections = {march:"NCEM-4341", june:"A"};
 
-  byId("published").textContent = investigation.observation.published_amount;
-  byId("rebuilt").textContent = money(investigation.observation.rebuilt_cents);
-  byId("gap").textContent = money(investigation.published_less_rebuilt_cents);
-  byId("investigation-summary").textContent =
-    `Extending the replay through the report’s August 15 publication still leaves a ${money(investigation.remaining_gap_at_publication_cents)} gap.`;
-  byId("checks").textContent =
-    `The June replay includes ${investigation.activities_at_cutoff} activities across ${investigation.worksheets_at_cutoff} worksheets. The next seven days add ${money(investigation.week_after_cutoff_net_cents)}. No single checked transaction, worksheet balance, or later cutoff through publication matches the difference.`;
-  byId("evidence-needed").textContent = investigation.evidence_needed;
-  byId("published-source").href = investigation.observation.published_source.url;
-
-  function makeRow(table, cells, flagged = false) {
-    const row = table.insertRow();
-    if (flagged) row.classList.add("flagged");
-    const draft = table.id === "draft-rows";
-    if (draft) row.setAttribute("role", "row");
-    const columnLabels = ["", "Draft", "Supported", "Difference"];
-    for (const [index, value] of cells.entries()) {
-      const cell = row.insertCell();
-      cell.textContent = value;
-      if (draft) {
-        cell.setAttribute("role", "cell");
-        if (index > 0) cell.dataset.label = columnLabels[index];
-      }
-      if (index >= (draft ? 1 : 2)) cell.classList.add("num");
+  function reportRows() {
+    if (report === "march") {
+      return (corrected ? data.corrected : data.initial).map(row => ({
+        ...row, id:row.line_id, title:names[row.line_id][0], reference:names[row.line_id][1],
+        reported:money(row.proposed_cents), atCutoff:row.supported_cents, difference:row.difference_cents
+      }));
     }
+    return data.historical.map(row => ({
+      ...row, id:row.category, title:data.categories[row.category], reference:"Category " + row.category,
+      reported:row.published_amount, atCutoff:row.rebuilt_cents,
+      difference:row.rebuilt_less_published_cents === null ? null : -row.rebuilt_less_published_cents
+    }));
   }
 
-  const exception = data.initial.find(row => row.status === "matches_later_balance");
-  byId("worksheet-source").href = exception.worksheet_source;
-  for (const event of exception.after_cutoff) {
-    makeRow(byId("later").tBodies[0], [event.date, `PW ${event.worksheet} · v${event.version}`, money(event.amount_cents)]);
-  }
-
-  function render(corrected) {
-    const rows = corrected ? data.corrected : data.initial;
-    const table = byId("draft-rows");
-    table.replaceChildren();
+  function renderRows(rows, restoreFocus) {
+    const body = byId("rows");
+    body.replaceChildren();
     for (const row of rows) {
-      makeRow(table, [labels[row.line_id], money(row.proposed_cents), money(row.supported_cents),
-        row.difference_cents ? money(row.difference_cents) : "Matches"], row.status !== "match");
+      const selected = row.id === selections[report];
+      const tr = body.insertRow();
+      tr.classList.toggle("selected", selected);
+      const label = document.createElement("th");
+      label.scope = "row";
+      const button = document.createElement("button");
+      button.className = "row-button";
+      button.type = "button";
+      button.setAttribute("aria-controls", "record");
+      button.setAttribute("aria-pressed", String(selected));
+      button.textContent = row.title;
+      const reference = document.createElement("span");
+      reference.className = "row-meta";
+      reference.textContent = row.reference;
+      button.append(reference);
+      button.addEventListener("click", () => {
+        selections[report] = row.id;
+        render(true);
+        if (matchMedia("(max-width:760px)").matches) byId("record-title").focus();
+      });
+      label.append(button);
+      tr.append(label);
+      for (const [index, value] of [row.reported, money(row.atCutoff), delta(row.difference)].entries()) {
+        const cell = tr.insertCell();
+        cell.className = index < 2 ? "num table-comparison" : "num";
+        cell.textContent = value;
+      }
+      const status = document.createElement("span");
+      status.className = "status " + row.status;
+      status.textContent = statusLabels[row.status];
+      tr.insertCell().append(status);
+      if (restoreFocus && selected) button.focus({preventScroll:true});
     }
-    const pending = rows.filter(row => row.status !== "match").length;
-    byId("draft-status").textContent = pending ? `${pending} figure needs review` : `${rows.length} of ${rows.length} figures match`;
-    byId("draft-status").classList.toggle("passed", !pending);
-    byId("apply").disabled = corrected;
-    for (const id of ["reset", "export-csv", "export-json"]) byId(id).disabled = !corrected;
+  }
+
+  function showBalances(row, draft) {
+    const list = byId("balances");
+    list.replaceChildren();
+    for (const [index, pair] of [
+      [draft ? "Draft amount" : "Published amount", row.reported],
+      ["FEMA at cutoff", money(row.atCutoff)],
+      [draft ? "Draft minus FEMA" : "Published minus FEMA", delta(row.difference)]
+    ].entries()) {
+      const term = document.createElement("dt");
+      const value = document.createElement("dd");
+      term.textContent = pair[0];
+      value.textContent = pair[1];
+      if (index === 2) term.className = value.className = "difference";
+      list.append(term, value);
+    }
+  }
+
+  function showEvidence(row, draft) {
+    const events = byId("events");
+    const nextStep = byId("next-step");
+    const isDebris = !draft && row.id === investigation.observation.category;
+    const isTiming = draft && row.id === "NCEM-4341";
+    let activities = [];
+    events.replaceChildren();
+    nextStep.hidden = true;
+    byId("finding-title").textContent = "Reconciliation";
+    if (isTiming) {
+      byId("finding-title").textContent = "Activity after Mar 31";
+      byId("finding-text").textContent = corrected
+        ? "The draft now uses the cutoff amount. Both later obligations are excluded."
+        : "Two obligations dated after the cutoff account for the full difference.";
+      activities = row.after_cutoff;
+    } else if (isDebris) {
+      byId("finding-title").textContent = "Checks performed";
+      byId("finding-text").textContent = "The cutoff balance covers " + investigation.activities_at_cutoff +
+        " activities across " + investigation.worksheets_at_cutoff + " worksheets. No single transaction, " +
+        "worksheet balance, or later cutoff through publication reproduces the published figure. " +
+        "Extending the cutoff through publication still leaves " +
+        money(investigation.remaining_gap_at_publication_cents) + " unexplained.";
+      nextStep.hidden = false;
+      byId("next-step-text").textContent = investigation.evidence_needed;
+    } else if (row.status === "invalid_published_amount") {
+      byId("finding-text").textContent = "The state report prints " + row.reported +
+        ". The comma grouping is invalid, so a numerical difference cannot be calculated.";
+      nextStep.hidden = false;
+      byId("next-step-text").textContent = "Verify the intended amount against the original state worksheet or Grants Portal export.";
+    } else {
+      byId("finding-text").textContent = draft
+        ? "The draft matches the cutoff balance from " + row.through_cutoff_count + " FEMA award activities."
+        : "The published amount matches FEMA award activity at the cutoff to the cent.";
+      if (draft && row.scope === "worksheet") activities = row.through_cutoff;
+    }
+    for (const event of activities) {
+      const tr = events.insertRow();
+      tr.insertCell().textContent = dateLabel(event.date);
+      tr.insertCell().textContent = "v" + event.version;
+      const amount = tr.insertCell();
+      amount.className = "num";
+      amount.textContent = delta(event.amount_cents);
+    }
+    byId("evidence-table").hidden = activities.length === 0;
+
+    const source = draft ? data.published_source : row.published_source;
+    const reportSource = byId("report-source");
+    reportSource.href = source.url;
+    reportSource.textContent = draft ? "State report reference" : "State report · p. " + source.printed_page;
+    const femaSource = byId("fema-source");
+    femaSource.href = row.worksheet_source || (isDebris ? investigation.openfema_url : femaDisaster);
+    femaSource.textContent = row.worksheet_source ? "FEMA worksheet activity" :
+      isDebris ? "FEMA debris removal activity" : "FEMA activity · DR-4827";
+    byId("apply").hidden = !isTiming || corrected;
+    byId("draft-exports").hidden = !draft || !corrected;
+    byId("investigation-export").hidden = !isDebris;
+    byId("record-actions").hidden = byId("apply").hidden && byId("draft-exports").hidden && !isDebris;
+  }
+
+  function render(restoreFocus = false) {
+    const draft = report === "march";
+    const rows = reportRows();
+    const selected = rows.find(row => row.id === selections[report]);
+    const matches = rows.filter(row => row.status === "match").length;
+    for (const id of ["march", "june"]) byId(id).setAttribute("aria-pressed", String(id === report));
+    byId("reported-heading").textContent = draft ? "Draft" : "Published";
+    byId("report-caption").textContent = "Cutoff " + dateLabel(draft ? data.cutoff : selected.cutoff) +
+      (draft ? " · Sample briefing" : " · Published figures");
+    byId("report-status").textContent = matches + " of " + rows.length + " match" +
+      (matches === rows.length ? "" : " · " + (rows.length - matches) + " to review");
+    byId("line-count").textContent = rows.length + " lines";
+    renderRows(rows, restoreFocus);
+    byId("record-meta").textContent = selected.reference;
+    byId("record-title").textContent = selected.title;
+    const status = byId("record-status");
+    status.className = "status " + selected.status;
+    status.textContent = statusLabels[selected.status];
+    byId("review-note").textContent = draft
+      ? "Federal obligations in USD. The practice draft contains one intentional error drawn from real records."
+      : "Federal obligations in USD. Published figures are preserved as printed.";
+    showBalances(selected, draft);
+    showEvidence(selected, draft);
   }
 
   function download(name, content, type) {
@@ -183,8 +353,20 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  byId("apply").addEventListener("click", () => { render(true); byId("export-csv").focus(); });
-  byId("reset").addEventListener("click", () => { render(false); byId("apply").focus(); });
+  for (const id of ["march", "june"]) {
+    byId(id).addEventListener("click", () => { report = id; render(); });
+  }
+  byId("apply").addEventListener("click", () => {
+    corrected = true;
+    render();
+    byId("export-csv").focus();
+  });
+  byId("reset").addEventListener("click", () => {
+    corrected = false;
+    selections.march = "NCEM-4341";
+    render();
+    byId("apply").focus();
+  });
   byId("export-csv").addEventListener("click", () => {
     const rows = data.corrected.map(row =>
       [row.line_id, row.scope, row.key, (row.proposed_cents / 100).toFixed(2)].join(","));
@@ -199,7 +381,7 @@
     download("june-2025-debris-investigation.json", JSON.stringify(
       {...investigation, source_pages:data.source_pages}, null, 2), "application/json");
   });
-  render(false);
+  render();
 </script>
 </body>
 </html>

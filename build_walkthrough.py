@@ -3,8 +3,8 @@
 import json
 from pathlib import Path
 
-from awards import load_awards
-from check import DATA, load_draft, reconcile, review
+from awards import CATEGORIES, load_awards
+from check import DATA, audit_history, load_draft, reconcile, review
 from investigate import investigate
 
 
@@ -30,10 +30,14 @@ def build():
                     del row[field]
         return rows
 
+    investigation = investigate(records)
+    historical = [row for row in audit_history(records, DATA)
+                  if row["cutoff"] == investigation["observation"]["cutoff"]]
     evidence = {
         "cutoff": CUTOFF, "initial": compact(results), "corrected": compact(corrected),
-        "published_source": published[-1]["published_source"], "source_pages": pages,
-        "investigation": investigate(records),
+        "published_source": next(row["published_source"] for row in published if row["cutoff"] == CUTOFF),
+        "source_pages": pages, "investigation": investigation,
+        "historical": historical, "categories": CATEGORIES,
     }
     payload = json.dumps(evidence, ensure_ascii=True, separators=(",", ":")).replace("<", "\\u003c")
     template = (ROOT / "walkthrough.template.html").read_text(encoding="utf-8")
