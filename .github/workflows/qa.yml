@@ -8,6 +8,7 @@ permissions:
 jobs:
   briefing-check:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest

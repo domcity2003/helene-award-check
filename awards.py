@@ -146,7 +146,13 @@ def _normalize(row: dict, source_url: str) -> dict:
         raise AwardError(f"OpenFEMA record {record_id} has an unknown Public Assistance category. Review the source row.")
 
     try:
-        timestamp = datetime.fromisoformat(row["dateObligated"])
+        raw_timestamp = row["dateObligated"]
+        if not isinstance(raw_timestamp, str):
+            raise ValueError("Expected an ISO timestamp")
+        # Python 3.10 requires an explicit offset in place of the UTC suffix.
+        if raw_timestamp.endswith("Z"):
+            raw_timestamp = raw_timestamp[:-1] + "+00:00"
+        timestamp = datetime.fromisoformat(raw_timestamp)
         if timestamp.tzinfo is None:
             raise ValueError("Missing timezone")
         effective_date = timestamp.astimezone(timezone.utc).date()
