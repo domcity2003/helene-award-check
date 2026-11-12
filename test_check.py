@@ -71,6 +71,39 @@ class BriefingChecks(unittest.TestCase):
         self.assertEqual(penny["status"], "mismatch")
         self.assertEqual(penny["difference_cents"], 1)
 
+    def test_june_review_uses_exact_ledger_amount_after_rounded_reconciliation(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "june.csv"
+            path.write_text(
+                "line_id,scope,key,proposed_usd\ndebris,category,A,602056030.50\n"
+                "rounded-debris,category,A,602056031\n",
+                encoding="utf-8",
+            )
+            output = cli("review", path, "--as-of", "2026-06-30", "--json")
+            self.assertEqual(output.returncode, 1, output.stderr)
+            result = json.loads(output.stdout)
+            self.assertEqual(result["reconciliation"][-1]["published_precision"], "dollar")
+            self.assertEqual(result["reconciliation"][-1]["published_category_dollars"]["A"], 602056031)
+            self.assertEqual([row["status"] for row in result["results"]], ["match", "mismatch"])
+            self.assertEqual(result["results"][1]["difference_cents"], 50)
+
+    def test_earlier_report_exceptions_are_reported_and_dates_stay_unavailable(self):
+        output = cli("audit-history", "--json")
+        self.assertEqual(output.returncode, 1, output.stderr)
+        rows = json.loads(output.stdout)["observations"]
+        self.assertEqual(sum(row["status"] == "match" for row in rows), 6)
+        exceptions = [(row["cutoff"], row["category"], row["status"], row["rebuilt_less_published_cents"])
+                      for row in rows if row["status"] != "match"]
+        self.assertEqual(exceptions, [
+            ("2025-03-31", "B", "mismatch", 11220042),
+            ("2025-06-30", "A", "mismatch", -406470134),
+            ("2025-06-30", "G", "invalid_published_amount", None),
+        ])
+        for cutoff in ("2025-03-31", "2025-06-30"):
+            blocked = cli("review", "examples/march-reviewed.csv", "--as-of", cutoff)
+            self.assertEqual(blocked.returncode, 2)
+            self.assertEqual(blocked.stdout, "")
+
     def test_rejects_malformed_input_without_partial_results(self):
         header = "line_id,scope,key,proposed_usd\n"
         cases = {
@@ -109,6 +142,16 @@ class BriefingChecks(unittest.TestCase):
             output = cli("--data", data, "reconcile", "--json")
             self.assertEqual(output.returncode, 2)
             self.assertIn("2026-03-31 category B by 0.01 USD", output.stderr)
+            self.assertEqual(output.stdout, "")
+            shutil.copyfile(DATA / "published-balances.json", reference)
+
+            reference = data / "june-holdout.json"
+            content = json.loads(reference.read_text(encoding="utf-8"))
+            content["fema_obligations_usd_whole_dollars"]["A"] -= 1
+            reference.write_text(json.dumps(content), encoding="utf-8")
+            output = cli("--data", data, "review", "examples/march-reviewed.csv", "--as-of", "2026-06-30", "--json")
+            self.assertEqual(output.returncode, 2)
+            self.assertIn("2026-06-30 category A by 1 whole USD", output.stderr)
             self.assertEqual(output.stdout, "")
 
 

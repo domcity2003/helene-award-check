@@ -1,0 +1,36 @@
+{
+  "disaster": "DR-4827-NC",
+  "reports": [
+    {
+      "cutoff": "2025-03-31",
+      "source": {
+        "url": "https://www.wncrecovery.nc.gov/grow-nc-q3qr-2025/open#page=15",
+        "printed_page": 15,
+        "pdf_page": 15,
+        "pdf_sha256": "13a048f62ca52c99630d02bf5172a3593485140eb027f288bf4d7a7f735b812d"
+      },
+      "amounts": {
+        "B": "$178,235,274.40"
+      }
+    },
+    {
+      "cutoff": "2025-06-30",
+      "source": {
+        "url": "https://www.wncrecovery.nc.gov/grow-nc-q4qr-2025/open#page=69",
+        "printed_page": 67,
+        "pdf_page": 69,
+        "pdf_sha256": "5eb1de2edbe21b99fe1c9e246b419f55ec6151cbc56e1b6f9325b57fa034c34c"
+      },
+      "amounts": {
+        "A": "$135,411,671.81",
+        "B": "$223,592,811.21",
+        "C": "$120,432,569.02",
+        "D": "$287,509.53",
+        "E": "$8,071,504.28",
+        "F": "$10,502,517.02",
+        "G": "$65,33,975.79",
+        "Z": "$22,131,560.60"
+      }
+    }
+  ]
+}

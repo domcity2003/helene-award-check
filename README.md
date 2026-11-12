@@ -34,7 +34,7 @@ emergency-work,category,B,572529086.68
 statewide,total,all,1530247208.35
 ```
 
-Use `worksheet` with a FEMA project worksheet number, `category` with a Public Assistance category code, or `total` with `all`. Line IDs are unique within a draft. Enter plain USD amounts with up to two decimal places. Supported dates are **2025-09-30**, **2025-12-31**, and **2026-03-31**.
+Use `worksheet` with a FEMA project worksheet number, `category` with a Public Assistance category code, or `total` with `all`. Line IDs are unique within a draft. Enter plain USD amounts with up to two decimal places. Supported dates are **2025-09-30**, **2025-12-31**, **2026-03-31**, and **2026-06-30**. Draft checks use the ledger's exact cents at every cutoff. The June published reference is rounded separately.
 
 ```sh
 python check.py review examples/march-draft.csv --as-of 2026-03-31 --json > review.json
@@ -50,13 +50,14 @@ The JSON records the proposed and supported amounts in integer cents, every incl
 
 ## Evidence and scope
 
-The checker verifies the hashes, disaster scope, page counts, and record IDs of four [pinned OpenFEMA responses](data/openfema/acquisition.json). It sums signed award activity in integer cents through the inclusive UTC cutoff, then checks each of the eight categories against three published North Carolina quarter ends. **All 24 balances match to the cent**, across 3,384 award activities.
+The checker verifies the hashes, disaster scope, page counts, and record IDs of four [pinned OpenFEMA responses](data/openfema/acquisition.json). It sums signed award activity in integer cents through the inclusive UTC cutoff. Across four supported dates, **32 category balances match at published precision**: 24 to the cent and eight to the dollar.
 
 | Cutoff | Federal obligations | Published appendix |
 | --- | ---: | --- |
 | Sep 30, 2025 | $784,000,491.00 | [FY26 Q1, pp. 64–65](https://www.wncrecovery.nc.gov/grow-nc-q1qr-2026/open#page=66) |
 | Dec 31, 2025 | $983,639,539.91 | [FY26 Q2, pp. 57–58](https://www.wncrecovery.nc.gov/grow-nc-q2qr-2026/open#page=59) |
 | Mar 31, 2026 | $1,530,247,208.35 | [FY26 Q3, p. 65](https://www.wncrecovery.nc.gov/grow-nc-q3qr-2026/open#page=67) |
+| Jun 30, 2026 | $2,350,422,001.31 | [FY26 Q4, p. 65](https://www.wncrecovery.nc.gov/grow-nc-q4qr-2026/open#page=67) |
 
 This work sample covers North Carolina Helene Public Assistance (DR-4827-NC) and measures federal obligations. Payment or reimbursement would require separate records. The tool reconstructs earlier balances using activity dates from a November 12, 2026 UTC capture. The published reports anchor the category totals for those dates. Project amounts are reconstructed from the FEMA activity records. [OpenFEMA dataset and field definitions](https://www.fema.gov/openfema-data-page/public-assistance-grant-award-activities-v2) · [Reference values and PDF hashes](data/published-balances.json).
 
@@ -66,6 +67,18 @@ This work sample covers North Carolina Helene Public Assistance (DR-4827-NC) and
 
 The eight displayed FEMA rows sum to $2,350,422,002. The page also lists a HUD drawdown of $1,200,847, and its $2,351,622,848 grand total covers both programs. Adding the displayed rows yields $1 more than the grand total, consistent with independent rounding. The validation uses only the eight FEMA rows, as identified by the appendix footnote. [Transcribed figures and PDF hash](data/june-holdout.json).
 
-Run `python validate_q4.py` to reproduce the comparison. The calculation and capture were already committed at [`a81969a`](https://github.com/domcity2003/helene-award-check/commit/a81969a92188fd4792f2c15e0c3d4a60e1e2bfcf) before the appendix figures were read. June remains an external validation case. The draft-review CLI accepts the original three dates, whose published category figures have cent precision.
+Run `python validate_q4.py` to see the June comparison row by row. The calculation and capture were committed before the appendix figures were read. [Original calculation and capture](https://github.com/domcity2003/helene-award-check/commit/a81969a92188fd4792f2c15e0c3d4a60e1e2bfcf).
 
-Run `python -m unittest -v` to reproduce the QA checks. They cover the example and its correction, signed reductions, an exact one-cent discrepancy, unknown and future worksheets, invalid input, source tampering, and disagreement with a published total. GitHub Actions runs the checks on Windows and Linux.
+## Earlier reports and unresolved exceptions
+
+Run `python check.py audit-history` for the two earlier reports. It returns exit code 1 when it finds a discrepancy or a malformed published amount. Add `--json` for the exact differences and report pages. Across nine observations, six matched, two differed, and one had malformed comma grouping.
+
+| Cutoff | Category | Published | Rebuilt | Finding |
+| --- | --- | ---: | ---: | --- |
+| Mar 31, 2025 | B | $178,235,274.40 | $178,347,474.82 | Replay higher by $112,200.42 |
+| Jun 30, 2025 | A | $135,411,671.81 | $131,346,970.47 | Replay lower by $4,064,701.34 |
+| Jun 30, 2025 | G | `$65,33,975.79` | $6,533,975.79 | Malformed published grouping |
+
+The March check uses the explicit Category B obligation in the narrative. The report labels the nearby table as expenditures and describes its overall Public Assistance figure inconsistently on page 16, so the audit includes only the Category B obligation from that report. The public records do not establish the cause of either difference. Both earlier dates require additional evidence before the checker can use them for draft review. [March report, pp. 15–16](https://www.wncrecovery.nc.gov/grow-nc-q3qr-2025/open#page=15) · [June report, p. 67](https://www.wncrecovery.nc.gov/grow-nc-q4qr-2025/open#page=69).
+
+Run `python -m unittest -v` to reproduce the QA checks. They cover signed reductions, one-cent discrepancies, unknown and future worksheets, invalid input, source tampering, rounding, and the historical exceptions. GitHub Actions runs the checks on Windows and Linux.
