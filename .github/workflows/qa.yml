@@ -25,3 +25,4 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m unittest -v
       - run: python check.py reconcile
+      - run: python validate_q4.py

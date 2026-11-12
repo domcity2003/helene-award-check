@@ -1,0 +1,23 @@
+{
+  "disaster": "DR-4827-NC",
+  "cutoff": "2026-06-30",
+  "publication_date": "2026-08-14",
+  "published_source": {
+    "url": "https://www.wncrecovery.nc.gov/grow-nc-q4qr-2026/open#page=67",
+    "printed_page": 65,
+    "pdf_page": 67,
+    "pdf_sha256": "abb10fa3e0edeab7d1d62aabb4d15a2bf37f1e4e722806583053c9a1f13f3ffa"
+  },
+  "fema_obligations_usd_whole_dollars": {
+    "A": 602056031,
+    "B": 692761539,
+    "C": 580107522,
+    "D": 17686252,
+    "E": 74798189,
+    "F": 129843362,
+    "G": 70849536,
+    "Z": 182319571
+  },
+  "hud_drawdown_usd_whole_dollars": 1200847,
+  "mixed_program_page_total_usd_whole_dollars": 2351622848
+}

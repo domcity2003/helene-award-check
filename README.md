@@ -60,4 +60,12 @@ The checker verifies the hashes, disaster scope, page counts, and record IDs of 
 
 This work sample covers North Carolina Helene Public Assistance (DR-4827-NC) and measures federal obligations. Payment or reimbursement would require separate records. The tool reconstructs earlier balances using activity dates from a November 12, 2026 UTC capture. The published reports anchor the category totals for those dates. Project amounts are reconstructed from the FEMA activity records. [OpenFEMA dataset and field definitions](https://www.fema.gov/openfema-data-page/public-assistance-grant-award-activities-v2) · [Reference values and PDF hashes](data/published-balances.json).
 
+## Fourth-quarter validation
+
+**All eight June 30, 2026 categories matched to the published dollar** using the same award capture and cutoff calculation. The checker reconstructed $2,350,422,001.31 in FEMA obligations from 2,909 activities through June 30. The state report publishes whole-dollar figures, so this test compares each reconstructed category after rounding to the nearest dollar. Category A lands exactly on the half-dollar and rounds up. [June report, printed p. 65](https://www.wncrecovery.nc.gov/grow-nc-q4qr-2026/open#page=67).
+
+The eight displayed FEMA rows sum to $2,350,422,002. The page also lists a HUD drawdown of $1,200,847, and its $2,351,622,848 grand total covers both programs. Adding the displayed rows yields $1 more than the grand total, consistent with independent rounding. The validation uses only the eight FEMA rows, as identified by the appendix footnote. [Transcribed figures and PDF hash](data/june-holdout.json).
+
+Run `python validate_q4.py` to reproduce the comparison. The calculation and capture were already committed at [`a81969a`](https://github.com/domcity2003/helene-award-check/commit/a81969a92188fd4792f2c15e0c3d4a60e1e2bfcf) before the appendix figures were read. June remains an external validation case. The draft-review CLI accepts the original three dates, whose published category figures have cent precision.
+
 Run `python -m unittest -v` to reproduce the QA checks. They cover the example and its correction, signed reductions, an exact one-cent discrepancy, unknown and future worksheets, invalid input, source tampering, and disagreement with a published total. GitHub Actions runs the checks on Windows and Linux.
