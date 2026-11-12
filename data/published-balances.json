@@ -1,0 +1,97 @@
+{
+  "disaster": "DR-4827-NC",
+  "program": "FEMA Public Assistance",
+  "publisher": "Governor’s Recovery Office for Western North Carolina",
+  "source_section": "Appendix: Other Federal Funds",
+  "currency": "USD",
+  "capture_method": "Manually transcribed from the published PDF text and independently checked against the five rendered appendix pages. Used as reference data for extractor verification.",
+  "retrieved_on": "2026-11-11",
+  "categories": {
+    "A": "Debris Removal",
+    "B": "Emergency Protective Measures",
+    "C": "Roads and Bridges",
+    "D": "Water Control Facilities",
+    "E": "Buildings and Equipment",
+    "F": "Utilities",
+    "G": "Parks, Recreational Facilities, and Other Items",
+    "Z": "Management Costs"
+  },
+  "snapshots": [
+    {
+      "cutoff": "2025-09-30",
+      "quarter": "FY26 Q1",
+      "publication_date": "2025-11-14",
+      "printed_pages": [
+        64,
+        65
+      ],
+      "pdf_pages": [
+        66,
+        67
+      ],
+      "sha256": "f7d49e890ed4f00e222761d5473b02af4164ca3da4a750e96f28a70fe8ed7e56",
+      "url": "https://www.wncrecovery.nc.gov/grow-nc-q1qr-2026/open",
+      "source_measure": "Obligated Costs",
+      "amounts": {
+        "A": "105873243.29",
+        "B": "292772633.34",
+        "C": "274999578.80",
+        "D": "916169.04",
+        "E": "22798771.67",
+        "F": "36127215.29",
+        "G": "19592120.72",
+        "Z": "30920758.85"
+      }
+    },
+    {
+      "cutoff": "2025-12-31",
+      "quarter": "FY26 Q2",
+      "publication_date": "2026-02-13",
+      "printed_pages": [
+        57,
+        58
+      ],
+      "pdf_pages": [
+        59,
+        60
+      ],
+      "sha256": "3523513baffed05e1ad5eb54eddc5d0625564af8674eed0cc218fc2150945671",
+      "url": "https://www.wncrecovery.nc.gov/grow-nc-q2qr-2026/open",
+      "source_measure": "Allocation or Obligated Cost",
+      "amounts": {
+        "A": "127839214.10",
+        "B": "333085629.47",
+        "C": "340685651.83",
+        "D": "4372546.43",
+        "E": "33973662.90",
+        "F": "71055857.93",
+        "G": "39630348.41",
+        "Z": "32996628.84"
+      }
+    },
+    {
+      "cutoff": "2026-03-31",
+      "quarter": "FY26 Q3",
+      "publication_date": "2026-05-15",
+      "printed_pages": [
+        65
+      ],
+      "pdf_pages": [
+        67
+      ],
+      "sha256": "60ea5a3a0edb9b8cda92506d759c4e7ac32959daf4da1573ffca02f01705e4ca",
+      "url": "https://www.wncrecovery.nc.gov/grow-nc-q3qr-2026/open",
+      "source_measure": "Federal Funding Allocated or Disbursed",
+      "amounts": {
+        "A": "258398574.21",
+        "B": "572529086.68",
+        "C": "450127183.67",
+        "D": "7064935.20",
+        "E": "41386322.80",
+        "F": "101187087.81",
+        "G": "62430988.69",
+        "Z": "37123029.29"
+      }
+    }
+  ]
+}

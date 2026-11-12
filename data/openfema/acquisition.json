@@ -1,0 +1,37 @@
+{
+  "source_base": "https://www.fema.gov",
+  "files": [
+    {
+      "filename": "award-0.json",
+      "url": "https://www.fema.gov/api/open/v2/PublicAssistanceGrantAwardActivities?%24filter=disasterNumber%20eq%204827&%24top=1000&%24count=true&%24orderby=id&%24skip=0",
+      "sha256": "b5435e9536dd4067798c61333d2ba4e5c5e027db5224e31c255c0dc7d7413e74",
+      "retrieved_utc": "2026-11-12T02:24:37.129Z",
+      "row_count": 1000,
+      "reported_count": 3384
+    },
+    {
+      "filename": "award-1000.json",
+      "url": "https://www.fema.gov/api/open/v2/PublicAssistanceGrantAwardActivities?%24filter=disasterNumber%20eq%204827&%24top=1000&%24count=true&%24orderby=id&%24skip=1000",
+      "sha256": "25e49dbce318b5afb82b147058359e20a54297386c266c6a609cd49dd5fbf066",
+      "retrieved_utc": "2026-11-12T02:24:37.132Z",
+      "row_count": 1000,
+      "reported_count": 3384
+    },
+    {
+      "filename": "award-2000.json",
+      "url": "https://www.fema.gov/api/open/v2/PublicAssistanceGrantAwardActivities?%24filter=disasterNumber%20eq%204827&%24top=1000&%24count=true&%24orderby=id&%24skip=2000",
+      "sha256": "9f679bac6baa5a5af7c0968b3ccef51ea1f1d78ec19648fc3ffb62765018ea45",
+      "retrieved_utc": "2026-11-12T02:24:37.074Z",
+      "row_count": 1000,
+      "reported_count": 3384
+    },
+    {
+      "filename": "award-3000.json",
+      "url": "https://www.fema.gov/api/open/v2/PublicAssistanceGrantAwardActivities?%24filter=disasterNumber%20eq%204827&%24top=1000&%24count=true&%24orderby=id&%24skip=3000",
+      "sha256": "c2590006068e680d3065cc75ffa8e44b0d5724bb3488d5a72ca67dca6f3235f3",
+      "retrieved_utc": "2026-11-12T02:24:37.043Z",
+      "row_count": 384,
+      "reported_count": 3384
+    }
+  ]
+}
