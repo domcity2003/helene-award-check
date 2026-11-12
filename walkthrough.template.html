@@ -73,6 +73,7 @@
   .control.primary:hover { background:#174780; }
   .links { display:flex; flex-wrap:wrap; gap:5px 16px; font-size:12px; }
   #draft-exports { display:flex; flex-wrap:wrap; gap:8px; }
+  #handoff-copy { display:block; margin-top:8px; width:100%; min-height:85px; font:inherit; }
   #review-note { margin-top:12px; font-size:12px; color:var(--muted); }
   @media(max-width:1130px) { .table-comparison { display:none; } }
   @media(max-width:760px) {
@@ -99,8 +100,10 @@
   <h1>Quarterly obligations review</h1>
   <p class="intro">Check recovery briefing figures against FEMA award activity as of the reporting cutoff.</p>
   <nav class="reports" aria-label="Reports">
-    <button id="march" type="button" aria-pressed="true">Mar 31, 2026 · Practice draft</button>
-    <button id="june" type="button" aria-pressed="false">Jun 30, 2025 · Published report</button>
+    <button id="june" type="button" aria-pressed="true">Jun 2025 · Published</button>
+    <button id="march-published" type="button" aria-pressed="false">Mar 2026 · Published</button>
+    <button id="june-published" type="button" aria-pressed="false">Jun 2026 · Published</button>
+    <button id="march" type="button" aria-pressed="false">Mar 2026 · Simulated draft</button>
   </nav>
   <div class="report-meta">
     <span id="report-caption"></span>
@@ -140,8 +143,10 @@
           </table>
         </div>
         <div class="record-section" id="next-step" hidden>
-          <h3>Evidence needed</h3>
+          <h3 id="next-step-title">Evidence needed</h3>
           <p id="next-step-text"></p>
+          <p id="handoff-owner" hidden><strong>Suggested owner</strong> · State Public Assistance reporting lead</p>
+          <textarea id="handoff-copy" aria-label="Handoff note" readonly hidden></textarea>
         </div>
         <div class="record-section links" aria-label="Sources">
           <a id="report-source">State report</a>
@@ -156,6 +161,9 @@
           <button class="control" id="reset" type="button">Reset draft</button>
         </div>
         <button class="control" id="investigation-export" type="button" hidden>Download investigation evidence</button>
+        <button class="control" id="copy-handoff" type="button" hidden>Copy handoff</button>
+        <span class="muted" id="handoff-status" role="status"></span>
+        <button class="control" id="report-export" type="button" hidden>Download reconciliation CSV</button>
       </div>
     </section>
   </div>
@@ -172,7 +180,7 @@
   const dates = new Intl.DateTimeFormat("en-US", {month:"short", day:"numeric", year:"numeric", timeZone:"UTC"});
   const dateLabel = day => dates.format(new Date(day));
   const money = cents => cents === null ? "—" : dollars.format(cents / 100);
-  const delta = cents => (cents > 0 ? "+" : "") + money(cents);
+  const delta = cents => (cents > 0 ? "+" : "") + money(cents === 0 ? 0 : cents);
   const names = {
     "NCEM-4341": ["NC Emergency Management", "Project worksheet 4341"],
     "MADISON-370": ["Madison County", "Project worksheet 370"],
@@ -184,9 +192,17 @@
     invalid_published_amount:"Invalid amount"
   };
   const femaDisaster = "https://www.fema.gov/api/open/v2/PublicAssistanceGrantAwardActivities?%24filter=disasterNumber%20eq%204827";
-  let report = "march";
+  const publishedCutoffs = {june:"2025-06-30", "march-published":"2026-03-31", "june-published":"2026-06-30"};
+  const reportIds = [...Object.keys(publishedCutoffs), "march"];
+  let report = "june";
   let corrected = false;
-  const selections = {march:"NCEM-4341", june:"A"};
+  const selections = {march:"NCEM-4341", june:"A", "march-published":"A", "june-published":"A"};
+  const handoffDecision = "Hold sign-off on the June 2025 debris removal figure until the source comparison is complete.";
+  const handoff = "Suggested owner: State Public Assistance reporting lead. " + handoffDecision + " Request " +
+    investigation.evidence_needed[0].toLowerCase() + investigation.evidence_needed.slice(1) +
+    " Published less OpenFEMA at cutoff: " + money(investigation.published_less_rebuilt_cents) +
+    ". State report: " + investigation.observation.published_source.url;
+  byId("handoff-copy").value = handoff;
 
   function reportRows() {
     if (report === "march") {
@@ -195,7 +211,7 @@
         reported:money(row.proposed_cents), atCutoff:row.supported_cents, difference:row.difference_cents
       }));
     }
-    return data.historical.map(row => ({
+    return data.historical.filter(row => row.cutoff === publishedCutoffs[report]).map(row => ({
       ...row, id:row.category, title:data.categories[row.category], reference:"Category " + row.category,
       reported:row.published_amount, atCutoff:row.rebuilt_cents,
       difference:row.rebuilt_less_published_cents === null ? null : -row.rebuilt_less_published_cents
@@ -245,9 +261,10 @@
     const list = byId("balances");
     list.replaceChildren();
     for (const [index, pair] of [
-      [draft ? "Draft amount" : "Published amount", row.reported],
+      [draft ? "Simulated draft amount" : "Published amount", row.reported],
       ["FEMA at cutoff", money(row.atCutoff)],
-      [draft ? "Draft minus FEMA" : "Published minus FEMA", delta(row.difference)]
+      [row.published_precision === "dollar" ? "Difference after rounding" :
+        draft ? "Draft minus FEMA" : "Published minus FEMA", delta(row.difference)]
     ].entries()) {
       const term = document.createElement("dt");
       const value = document.createElement("dd");
@@ -261,11 +278,15 @@
   function showEvidence(row, draft) {
     const events = byId("events");
     const nextStep = byId("next-step");
-    const isDebris = !draft && row.id === investigation.observation.category;
+    const isDebris = report === "june" && row.id === investigation.observation.category;
     const isTiming = draft && row.id === "NCEM-4341";
     let activities = [];
     events.replaceChildren();
     nextStep.hidden = true;
+    byId("handoff-owner").hidden = !isDebris;
+    byId("handoff-copy").hidden = true;
+    byId("handoff-status").textContent = "";
+    byId("next-step-title").textContent = isDebris ? "Recommended handoff" : "Evidence needed";
     byId("finding-title").textContent = "Reconciliation";
     if (isTiming) {
       byId("finding-title").textContent = "Activity after Mar 31";
@@ -281,7 +302,8 @@
         "Extending the cutoff through publication still leaves " +
         money(investigation.remaining_gap_at_publication_cents) + " unexplained.";
       nextStep.hidden = false;
-      byId("next-step-text").textContent = investigation.evidence_needed;
+      byId("next-step-text").textContent = handoffDecision + " Request " +
+        investigation.evidence_needed[0].toLowerCase() + investigation.evidence_needed.slice(1);
     } else if (row.status === "invalid_published_amount") {
       byId("finding-text").textContent = "The state report prints " + row.reported +
         ". The comma grouping is invalid, so a numerical difference cannot be calculated.";
@@ -290,7 +312,9 @@
     } else {
       byId("finding-text").textContent = draft
         ? "The draft matches the cutoff balance from " + row.through_cutoff_count + " FEMA award activities."
-        : "The published amount matches FEMA award activity at the cutoff to the cent.";
+        : row.published_precision === "dollar"
+          ? "The state reports whole dollars. The exact FEMA balance shown above matches after rounding to the nearest dollar."
+          : "The published amount matches FEMA award activity at the cutoff to the cent.";
       if (draft && row.scope === "worksheet") activities = row.through_cutoff;
     }
     for (const event of activities) {
@@ -306,7 +330,8 @@
     const source = draft ? data.published_source : row.published_source;
     const reportSource = byId("report-source");
     reportSource.href = source.url;
-    reportSource.textContent = draft ? "State report reference" : "State report · p. " + source.printed_page;
+    reportSource.textContent = draft ? "State report reference" :
+      "State report · p. " + (source.printed_page ?? source.printed_pages.join("–"));
     const femaSource = byId("fema-source");
     femaSource.href = row.worksheet_source || (isDebris ? investigation.openfema_url : femaDisaster);
     femaSource.textContent = row.worksheet_source ? "FEMA worksheet activity" :
@@ -314,7 +339,9 @@
     byId("apply").hidden = !isTiming || corrected;
     byId("draft-exports").hidden = !draft || !corrected;
     byId("investigation-export").hidden = !isDebris;
-    byId("record-actions").hidden = byId("apply").hidden && byId("draft-exports").hidden && !isDebris;
+    byId("copy-handoff").hidden = !isDebris;
+    byId("report-export").hidden = draft;
+    byId("record-actions").hidden = draft && byId("apply").hidden && byId("draft-exports").hidden;
   }
 
   function render(restoreFocus = false) {
@@ -322,10 +349,10 @@
     const rows = reportRows();
     const selected = rows.find(row => row.id === selections[report]);
     const matches = rows.filter(row => row.status === "match").length;
-    for (const id of ["march", "june"]) byId(id).setAttribute("aria-pressed", String(id === report));
-    byId("reported-heading").textContent = draft ? "Draft" : "Published";
+    for (const id of reportIds) byId(id).setAttribute("aria-pressed", String(id === report));
+    byId("reported-heading").textContent = draft ? "Simulated draft" : "Published";
     byId("report-caption").textContent = "Cutoff " + dateLabel(draft ? data.cutoff : selected.cutoff) +
-      (draft ? " · Sample briefing" : " · Published figures");
+      (draft ? " · Simulated briefing" : selected.published_precision === "dollar" ? " · Compared at whole-dollar precision" : " · Published figures");
     byId("report-status").textContent = matches + " of " + rows.length + " match" +
       (matches === rows.length ? "" : " · " + (rows.length - matches) + " to review");
     byId("line-count").textContent = rows.length + " lines";
@@ -353,9 +380,32 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  for (const id of ["march", "june"]) {
+  for (const id of reportIds) {
     byId(id).addEventListener("click", () => { report = id; render(); });
   }
+  byId("copy-handoff").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(handoff);
+      byId("handoff-status").textContent = "Handoff copied";
+    } catch {
+      const note = byId("handoff-copy");
+      note.hidden = false;
+      note.focus();
+      note.select();
+      byId("handoff-status").textContent = "Handoff selected. Copy it with your keyboard.";
+    }
+  });
+  byId("report-export").addEventListener("click", () => {
+    const rows = reportRows().map(row => [
+      row.cutoff, row.category, row.title, row.reported, row.atCutoff, row.difference,
+      row.published_precision ?? "cent", row.status, row.published_source.url
+    ]);
+    const header = ["cutoff", "category_code", "category", "published_amount_as_printed", "fema_cutoff_cents",
+      "published_minus_fema_cents_at_report_precision", "comparison_precision", "result", "state_report_url"];
+    const csv = [header, ...rows].map(row => row.map(value =>
+      '"' + String(value ?? "").replaceAll('"', '""') + '"').join(",")).join("\r\n") + "\r\n";
+    download(publishedCutoffs[report] + "-reconciliation.csv", csv, "text/csv");
+  });
   byId("apply").addEventListener("click", () => {
     corrected = true;
     render();
