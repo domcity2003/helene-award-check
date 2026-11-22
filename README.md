@@ -2,9 +2,11 @@
 
 Check the FEMA figures in a draft recovery briefing before it goes out. Give the checker a CSV and a quarter-end date. It returns the supported amounts, flags discrepancies, and shows which transactions support each result.
 
-**Try the offline walkthrough.** Download `walkthrough.html` from the file page using **Download raw file**, then open it in your browser. Start with the published June 2025 debris removal discrepancy and copy the handoff for a state reporting lead. Compare two later published reports and download their reconciliations, or correct the intentional cutoff error in the March 2026 simulation. The walkthrough embeds results calculated from the pinned data. Use the CLI to review your own files. [Walkthrough file](walkthrough.html).
+**Try the [offline walkthrough](walkthrough.html).** On the file page, choose **Download raw file**, open it in your browser, and select **Mar 2026 · Simulated draft**. Inspect the two later transactions, then apply the correction. The walkthrough also lets you explore earlier published reports and export their reconciliations.
 
-**In the March example, a draft uses $286,345,207.02 for one North Carolina Emergency Management project. The amount as of March 31 was $200,013,459.45.** Two later transactions explain the entire $86,331,747.57 difference. The example draft intentionally uses the wrong balance from real FEMA records.
+**The checker flags an $86,331,747.57 cutoff difference** in a simulated March 2026 draft using real FEMA obligation records. The draft uses a later balance of $286,345,207.02. The supported March 31 amount is $200,013,459.45, and the checker shows the two transactions that explain the difference.
+
+![CLI excerpt for the simulated March draft, showing the flagged balance and the two transactions posted after the cutoff.](march-cutoff.png)
 
 ## Run the example
 
